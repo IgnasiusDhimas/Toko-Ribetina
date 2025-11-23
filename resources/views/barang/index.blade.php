@@ -13,7 +13,7 @@
 <div class="card p-3 mb-4 shadow-sm">
     <h4 class="fw-bold">Ekspor Data Stok Rendah</h4>
     <p>Unduh data barang stok < 5 dalam format Excel.</p>
-    <a href="{{ url('/barang/stok-rendah/excel-manual') }}" class="btn btn-success">
+    <a href="/barang/stok-rendah/excel-manual" class="btn btn-success">
         📥 Ekspor ke Excel
     </a>
 </div>
