@@ -22,4 +22,4 @@ RUN composer install --optimize-autoloader --no-interaction --no-progress
 EXPOSE 8000
 
 # Start Laravel using PHP built-in server with Railway's injected port
-CMD php -r '$port = getenv("PORT") ?: 8000; passthru("php -S 0.0.0.0:$port -t public");'
+CMD php artisan migrate --force && php -r '$port = getenv("PORT") ?: 8000; passthru("php -S 0.0.0.0:$port -t public");'
