@@ -12,7 +12,7 @@
 
 <div class="card p-3 mb-4 shadow-sm">
     <h4 class="fw-bold">Ekspor Data Stok Rendah</h4>
-    <p>Unduh data barang stok &lt; 5 dalam format Excel.</p>
+    <p>Unduh data barang stok < 5 dalam format Excel.</p>
     <a href="{{ url('/barang/stok-rendah/excel-manual') }}" class="btn btn-success">
         📥 Ekspor ke Excel
     </a>
@@ -57,7 +57,7 @@
 
 <h3 class="fw-bold">🧾 Form Kasir</h3>
 
-<form id="form-kasir" class="card p-4 shadow-sm">
+<form id="form-kasir" class="card p-4 shadow-sm" action="{{ route('kasir.simpan') }}" method="POST">
     @csrf
 
     <div class="mb-3">
@@ -97,7 +97,7 @@
     <input type="hidden" name="items" id="items_json">
     <input type="hidden" name="total_harga" id="total_harga">
 
-    <button type="button" class="btn btn-success" onclick="submitTransaksi()">💾 Simpan Transaksi</button>
+    <button type="submit" class="btn btn-success">💾 Simpan Transaksi</button>
 </form>
 
 @endsection
@@ -137,10 +137,7 @@
     function renderKeranjang() {
         tbody.innerHTML = "";
         keranjang.forEach(item => {
-
-            // 👇 FIX AGAR TIDAK ERROR DAN TOMBOL TIDAK MATI
             const namaBarang = document.querySelector(`#barangSelect option[value='${item.barang_id}']`).dataset.nama;
-
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${namaBarang}</td>
@@ -155,29 +152,5 @@
         document.getElementById('total_harga').value =
             keranjang.reduce((s, i) => s + i.subtotal, 0);
     }
-
-    function submitTransaksi() {
-        const form = document.getElementById('form-kasir');
-        const formData = new FormData(form);
-
-        fetch("{{ route('kasir.simpan') }}", {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.blob())
-        .then(blob => {
-
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "invoice_" + new Date().getTime() + ".pdf";
-            a.click();
-
-            // 👇 FIX AGAR REFRESH AUTO SETELAH DOWNLOAD
-            setTimeout(() => location.reload(), 600);
-        })
-        .catch(err => console.error(err));
-    }
 </script>
 @endsection
-

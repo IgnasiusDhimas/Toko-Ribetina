@@ -68,10 +68,12 @@ class KasirController extends Controller
             $pdf = PDF::loadView('kasir.invoice', compact('transaksi'))
                       ->setPaper('A4', 'portrait');
 
-            // ✅ FIX: return dengan header agar fetch() bisa download
-            return response($pdf->output(), 200)
-                ->header('Content-Type', 'application/pdf')
-                ->header('Content-Disposition', 'attachment; filename="Invoice_'.$transaksi->kode_transaksi.'.pdf"');
+            // ✅ FIX: gunakan streamDownload agar lebih stabil di Railway
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, 'Invoice_'.$transaksi->kode_transaksi.'.pdf', [
+                'Content-Type' => 'application/pdf',
+            ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
