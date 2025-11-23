@@ -35,14 +35,12 @@
             <td>{{ $barang->nama }}</td>
             <td>{{ $barang->stok }}</td>
             <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-            <td>Rp {{ number_format($barang->total_nilai, 0, ',', '.') }}</td>
+            <td>Rp {{ number_format($barang->stok * $barang->harga, 0, ',', '.') }}</td>
             <td>
-                <a href="/barang/{{ $barang->id_barang }}/edit"
-                   class="btn btn-sm btn-warning">✏ Edit</a>
+                <a href="/barang/{{ $barang->id_barang }}/edit" class="btn btn-sm btn-warning">✏ Edit</a>
             </td>
             <td>
-                <form action="/barang/{{ $barang->id_barang }}" method="POST"
-                      onsubmit="return confirm('Yakin ingin hapus barang ini?')">
+                <form action="/barang/{{ $barang->id_barang }}" method="POST" onsubmit="return confirm('Yakin ingin hapus barang ini?')">
                     @csrf
                     @method('DELETE')
                     <button class="btn btn-sm btn-danger">🗑 Hapus</button>
