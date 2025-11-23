@@ -18,8 +18,8 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-interaction --no-progress
 
-# Expose port (Railway inject PORT env)
+# Expose port (optional but good practice)
 EXPOSE 8000
 
-# Start Laravel via PHP built-in server
+# Start Laravel using PHP built-in server with Railway's injected port
 CMD php -r '$port = getenv("PORT") ?: 8000; passthru("php -S 0.0.0.0:$port -t public");'
