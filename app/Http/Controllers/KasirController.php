@@ -14,7 +14,7 @@ class KasirController extends Controller
 {
     public function index()
     {
-        $barangs = Barang::all(); // Jangan dibatasi stok > 0, biar bisa tetap tampil tapi disabled
+        $barangs = Barang::all(); // tampilkan semua barang, stok habis tetap muncul tapi disabled
         return view('barang.index', compact('barangs'));
     }
 
@@ -29,11 +29,9 @@ class KasirController extends Controller
         DB::beginTransaction();
 
         try {
-
-            // VALIDASI STOK dulu
+            // VALIDASI STOK
             foreach ($items as $item) {
                 $barang = Barang::find($item['barang_id']);
-
                 if ($barang->stok < $item['jumlah']) {
                     return back()->with('error', "Stok barang {$barang->nama} tidak mencukupi!");
                 }
@@ -41,7 +39,6 @@ class KasirController extends Controller
 
             // SIMPAN TRANSAKSI
             $kode = 'TRX-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(4));
-
             $transaksi = Transaksi::create([
                 'kode_transaksi' => $kode,
                 'tanggal' => now(),
@@ -50,7 +47,6 @@ class KasirController extends Controller
 
             // SIMPAN DETAIL & UPDATE STOK
             foreach ($items as $item) {
-
                 DetailTransaksi::create([
                     'transaksi_id' => $transaksi->id_transaksi,
                     'barang_id' => $item['barang_id'],
@@ -60,7 +56,7 @@ class KasirController extends Controller
                 ]);
 
                 Barang::where('id_barang', $item['barang_id'])
-                        ->decrement('stok', $item['jumlah']);
+                      ->decrement('stok', $item['jumlah']);
             }
 
             DB::commit();
@@ -70,11 +66,12 @@ class KasirController extends Controller
 
             // Generate PDF
             $pdf = PDF::loadView('kasir.invoice', compact('transaksi'))
-                    ->setPaper('A4', 'portrait');
+                      ->setPaper('A4', 'portrait');
 
-            session()->flash('success', 'Transaksi berhasil & invoice berhasil diunduh!');
-
-            return $pdf->download('Invoice_'.$transaksi->kode_transaksi.'.pdf');
+            // ✅ FIX: return dengan header agar fetch() bisa download
+            return response($pdf->output(), 200)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'attachment; filename="Invoice_'.$transaksi->kode_transaksi.'.pdf"');
 
         } catch (\Exception $e) {
             DB::rollBack();
