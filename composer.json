@@ -71,7 +71,11 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "ext-gd": "*"
         }
+
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
