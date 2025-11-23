@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # Install dependencies + GD
 RUN apt-get update && apt-get install -y \
@@ -16,6 +16,10 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --optimize-autoloader --no-interaction
+RUN composer install --optimize-autoloader --no-interaction --no-progress
 
-CMD ["php-fpm"]
+# Expose port (Railway inject PORT env)
+EXPOSE 8000
+
+# Start Laravel via PHP built-in server
+CMD php -r '$port = getenv("PORT") ?: 8000; passthru("php -S 0.0.0.0:$port -t public");'
